@@ -1,0 +1,91 @@
+1.动态语言：程序运行时，允许改变程序结构或变量类型，这种语言称为动态语言。
+  例如：Perl、Python、Ruby是动态语言，C++、Java、C#不是，但是Java有反射机制(动态相关机制)，使得Java程序可以加载一个运行时才得知名称的class，获悉其完整构造（但不包括methods定义），并生成其对象实体、或对其fields设值、或唤起其methods。
+ 
+2.反射：Java的特征之一，允许运行中的Java程序获取自身的信息，并且可以操作类或对象的内部属性。核心是JVM在运行时才动态加载类或调用方法/访问属性，它不需要在写代码或编译期知道运行对象是谁。  
+  用途：当我们的程序在运行时，需要动态的加载一些类这些类可能之前用不到所以不用加载到jvm，而是在运行时根据需要才加载，这样的好处对于服务器来说不言而喻，举个例子我们的项目底层有时是用mysql，有时用oracle，需要动态地根据实际情况加载驱动类，这个时候反射就有用了。
+
+3.类对象：用于描述这种类，都有什么属性，什么方法
+  获取类对象：1) Class.forName(使用Class类的forName静态方法) 2) Hero.class(直接获取某一个对象的class) 3) new Hero().getClass()
+  注意：1)在一个JVM中(准确讲是一个ClassLoader下，通常一个JVM下，只会有一个ClassLoader)，一种类只会有一个类对象存在。
+        2)获取类对象的时候，都会导致静态属性被初始化(除非直接使用 Class c = Hero.class 这种方式，才不会导致静态属性被初始化)
+		3)程序中一般的对象的类型在编译期就确定了，而Java反射机制可以动态地创建对象并调用其属性，该对象的类型在编译期是未知的。
+		
+4.Java反射框架主要提供以下功能：
+  1) 在运行时判断任意一个对象所属的类；
+  2) 在运行时构造任意一个类的对象；
+  3) 在运行时判断任意一个类所具有的成员变量和方法（通过反射甚至可以调用private方法）；
+  4) 在运行时调用任意一个对象的方法.
+  注意：反射可以用于判断任意对象所属的类，获取CLass对象，构造任意一个对象以及调用一个对象。
+        但是，其最重要的用途就是开发各种通用框架，同时它也是各种容器实现的核心
+  
+5.实现基本反射功能：
+  1) 获得Class对象(上述三种方法)
+  2) 判断是否为某个类的实例(一般我们用instanceof关键字来判断是否为某个类的实例，这里我们借助反射中Class对象的isInstance()方法来判断是否为某个类的实例)
+  3) 创建实例，通过反射生成对象主要有两种方式：
+     a) 使用Class对象的newInstance()方法来创建Class对象对应类的实例
+	    Class<?> c = String.class;
+		Object str = c.newInstance();
+	 b) 先通过Class对象获取指定的Constructor对象，再调用Constructor对象的newInstance()方法来创建实例。这种方法可以用指定的构造器构造类的实例。
+        Class<?> c = String.class;  //获取String所对应的Class对象
+		Constructor constructor = c.getConstructor(String.class);  //获取String类带一个String参数的构造器
+		Object obj = constructor.newInstance("2333");  //根据构造器创建实例
+  4) 获取方法：
+     a) getDeclaredMethods() 返回类或接口声明的所有方法，包括公共、保护、默认（包）访问和私有方法，但不包括继承的方法
+        public Method[] getDeclaredMethods() throws SecurityException 
+     b) getMethods() 返回某个类的所有公用（public）方法，包括其继承类的公用方法
+        public Method[] getMethods() throws SecurityException
+     c) getMethod(String name, Class<?>... parameterTypes) 返回一个特定的方法，其中第一个参数为方法名称，后面的参数为方法的参数对应Class的对象		
+  
+  5) 获取构造器信息：获取类构造器的用法与上述获取方法的用法类似。通过Class类的getConstructor方法得到Constructor类的一个实例，而Constructor类有一个newInstance方法可以创建一个对象实例.
+     public T newInstance(Object ... initargs)
+  
+  6) 获取类的成员变量(字段)信息：
+     a) getFiled: 访问公有的成员变量
+     b) getDeclaredField：所有已声明的成员变量。但不能得到其父类的成员变量
+     c) getFileds和getDeclaredFields用法同上（参照Method）
+  
+  7) 调用方法：当我们从类中获取了一个方法后，可以调用invoke()方法来调用这个方法
+     invoke方法原型：
+	     public Object invoke(Object obj, Object... args)
+            throws IllegalAccessException, IllegalArgumentException,
+				InvocationTargetException
+  
+  8) 利用反射创建数组：数组在Java里是比较特殊的一种类型，它可以赋值给一个Object Reference。
+  
+6.总结
+  由于反射会额外消耗一定的系统资源，因此如果不需要动态地创建一个对象，那么就不需要用反射。
+  另外，反射调用方法时可以忽略权限检查，因此可能会破坏封装性而导致安全问题
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
